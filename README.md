@@ -98,9 +98,9 @@
 
 ```
 ML_ASOIU/
-├── README.md              # Описание проекта
-├── TASK.md               # Условия задач рубежного контроля
-├── rk1.ipynb              # Jupyter Notebook с решением задач
-├── plots/                 # Директория для сохранения графиков
-└── ecommerce_sales_dataset.csv  # Набор данных
+├── README.md                       # Описание проекта
+├── TASK.md                         # Условия задач рубежного контроля
+├── rk1.ipynb                       # Jupyter Notebook с решением задач
+├── plots/                          # Директория для сохранения графиков
+└── ecommerce_sales_dataset.csv     # Набор данных
 ```
