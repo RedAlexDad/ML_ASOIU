@@ -9,17 +9,31 @@
 ## Запуск
 
 ```bash
-pip install gymnasium torch matplotlib
 python main.py
 ```
 
-## Архитектура
-
-- Q-network: 3 слоя (state_dim → 128 → 128 → action_dim)
-- Replay Buffer: 10000
-- Target Network: обновление каждые 100 шагов
-- Epsilon-greedy: decay от 1.0 до 0.01
-
 ## Результаты
 
-(в процессе...)
+| Этап | Значение |
+|-------|----------|
+| Обучающих эпизодов | 50 |
+| Максимальная награда | 500.0 |
+| Средняя награда при оценке | 98.8 |
+| Epsilon (исследование) | 0.01 |
+
+## Структура
+
+```
+├── main.py           # Основной код
+├── dqn/              # Модули (network, buffer, agent)
+├── src/              # Вспомогательные функции
+└── plots/            # Графики обучения
+```
+
+## Параметры
+
+- Hidden dim: 128
+- Learning rate: 0.003
+- Gamma: 0.99
+- Batch size: 32
+- Replay buffer: 10000
