@@ -3,31 +3,8 @@
 """
 
 import gymnasium as gym
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import time
 from dqn import DQNAgent
-
-
-class QNetwork(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_dim=128):
-        super().__init__()
-        self.fc1 = nn.Linear(state_dim, hidden_dim)
-        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-        self.fc3 = nn.Linear(hidden_dim, action_dim)
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        return self.fc3(x)
-
-
-def load_agent(path='dqn_model.pth', state_dim=4, action_dim=2):
-    agent = QNetwork(state_dim, action_dim)
-    agent.load_state_dict(torch.load(path))
-    agent.eval()
-    return agent
+import time
 
 
 def play(agent, env, episodes=3, delay=0.02):
@@ -39,9 +16,7 @@ def play(agent, env, episodes=3, delay=0.02):
         print(f"\nЭпизод {episode + 1}/{episodes}")
         
         while True:
-            with torch.no_grad():
-                action = agent(torch.FloatTensor(state).unsqueeze(0)).argmax().item()
-            
+            action = agent.select_action(state, training=False)
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
             
@@ -65,7 +40,8 @@ def play(agent, env, episodes=3, delay=0.02):
 
 if __name__ == '__main__':
     print("Загрузка модели...")
-    agent = load_agent()
+    agent = DQNAgent(state_dim=4, action_dim=2, hidden_dim=128)
+    agent.load('dqn_model.pth')
     
     print("Создание окружения с визуализацией...")
     env = gym.make('CartPole-v1', render_mode='human')
