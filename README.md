@@ -1,6 +1,6 @@
 # Методы машинного обучения (ММО)
 
-Репозиторий с заданиями по курсу **«Методы машинного обучения в АСОИУ»**, ИУ5Ц-21М, МГТУ им. Баумана.
+Репозиторий с заданиями по курсу "Методы машинного обучения в АСОИУ", ИУ5Ц-21М, МГТУ им. Баумана.
 
 Все работы выполнены в виде Jupyter Notebook (Python).
 
@@ -17,19 +17,18 @@
 
 ## Лабораторные работы
 
-| # | Тема | Статус | Ветка |
-|---|------|--------|-------|
-| LR1 | Обработка признаков (пропуски, кодирование, нормализация) | ✅ готово | [lr1-feature-processing](https://github.com/RedAlexDad/ML_ASOIU/tree/lr1-feature-processing) |
-| LR2 | Обработка признаков (масштабирование, выбросы, отбор признаков) | ✅ готово | [lr2-feature-processing-ev](https://github.com/RedAlexDad/ML_ASOIU/tree/lr2-feature-processing-ev) |
-| LR3 | Методы многомерного поиска (FR, PR, DFP, BFGS, L-BFGS) | ✅ готово | [lr3-multidimensional-search](https://github.com/RedAlexDad/ML_ASOIU/tree/lr3-multidimensional-search) |
-| LR4 | Методы поиска условного экстремума | ✅ готово | [lr4-constrained-optimization](https://github.com/RedAlexDad/ML_ASOIU/tree/lr4-constrained-optimization) |
+| # | Тема | Ветка |
+|---|------|-------|
+| LR1 | Обработка признаков (пропуски, кодирование, нормализация) | [lr1-feature-processing](https://github.com/RedAlexDad/ML_ASOIU/tree/lr1-feature-processing) |
+| LR2 | Обработка признаков (масштабирование, выбросы, отбор признаков) | [lr2-feature-processing-ev](https://github.com/RedAlexDad/ML_ASOIU/tree/lr2-feature-processing-ev) |
+| LR3 | Методы многомерного поиска (FR, PR, DFP, BFGS, L-BFGS) | [lr3-multidimensional-search](https://github.com/RedAlexDad/ML_ASOIU/tree/lr3-multidimensional-search) |
+| LR4 | Методы поиска условного экстремума | [lr4-constrained-optimization](https://github.com/RedAlexDad/ML_ASOIU/tree/lr4-constrained-optimization) |
 
 ## Рубежные контроли
 
-| # | Тема | Вариант | Статус |
-|---|------|---------|--------|
-| РК1 | Предобработка данных (EDA, выбросы, Target Encoding, MaxAbs Scaling) | 2 | ✅ готово |
-| РК2 | — | — | — |
+| # | Тема | Вариант |
+|---|------|---------|
+| РК1 | Предобработка данных (EDA, выбросы, Target Encoding, MaxAbs Scaling) | 2 |
 
 ## Переключение между ветками
 
