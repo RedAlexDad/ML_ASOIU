@@ -16,8 +16,9 @@ def plot_results(
     
     axes[0, 0].plot(rewards, alpha=0.6, label='Raw')
     window = 20
-    smoothed = np.convolve(rewards, np.ones(window)/window, mode='valid')
-    axes[0, 0].plot(range(window-1, len(rewards)), smoothed, 'r-', label=f'Smoothed (w={window})')
+    if len(rewards) >= window:
+        smoothed = np.convolve(rewards, np.ones(window)/window, mode='valid')
+        axes[0, 0].plot(range(window-1, len(rewards)), smoothed, 'r-', label=f'Smoothed (w={window})')
     axes[0, 0].set_xlabel('Episode')
     axes[0, 0].set_ylabel('Reward')
     axes[0, 0].set_title('Total Reward per Episode')
@@ -48,10 +49,11 @@ def plot_results(
     
     plt.figure(figsize=(10, 6))
     plt.plot(rewards)
-    plt.fill_between(range(len(rewards)), 
-                     np.array(rewards) - np.std(rewards[-50:]), 
-                     np.array(rewards) + np.std(rewards[-50:]), 
-                     alpha=0.3)
+    if len(rewards) >= 50:
+        plt.fill_between(range(len(rewards)), 
+                         np.array(rewards) - np.std(rewards[-50:]), 
+                         np.array(rewards) + np.std(rewards[-50:]), 
+                         alpha=0.3)
     plt.xlabel('Episode')
     plt.ylabel('Total Reward')
     plt.title('DQN Training Progress with Confidence Interval')

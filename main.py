@@ -16,7 +16,7 @@ from dqn import DQNAgent
 from src import get_env_info, make_env, train, evaluate, plot_results
 
 
-EPISODES = 500
+EPISODES = 10
 BATCH_SIZE = 64
 HIDDEN_DIM = 128
 LEARNING_RATE = 0.001
