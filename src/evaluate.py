@@ -1,9 +1,14 @@
 import numpy as np
 import torch
-import mlflow
 import gymnasium as gym
 from typing import Dict
 from dqn.agent import DQNAgent
+
+mlflow = None
+try:
+    import mlflow
+except ImportError:
+    pass
 
 
 def evaluate(env: gym.Env, agent: DQNAgent, episodes: int = 20) -> Dict[str, float]:
@@ -46,8 +51,5 @@ def evaluate(env: gym.Env, agent: DQNAgent, episodes: int = 20) -> Dict[str, flo
         "mean_q_value": np.mean(eval_q_values),
         "mean_episode_length": np.mean(episode_lengths),
     }
-    
-    for key, value in results.items():
-        mlflow.log_metric(f"eval_{key}", value)
     
     return results
