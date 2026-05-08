@@ -7,12 +7,12 @@
 ## Структура
 
 ```
-├── main/                     # Этот README
-├── lr1-feature-processing/   # LR1 - Обработка признаков (ч.1)
-├── lr2-feature-processing-ev/ # LR2 - Обработка признаков (ч.2)
-├── lr3-multidimensional-search/ # LR3 - Многомерный поиск
-├── lr4-constrained-optimization/ # LR4 - Условная оптимизация
-└── rk1-data-processing/      # РК1
+├── main/                               # Этот README
+├── lr1-feature-processing/             # LR1 - Обработка признаков (ч.1)
+├── lr2-feature-processing-ev/          # LR2 - Обработка признаков (ч.2)
+├── lr3-multidimensional-search/        # LR3 - Многомерный поиск
+├── lr4-constrained-optimization/       # LR4 - Условная оптимизация
+└── rk1-data-processing/                # РК1
 ```
 
 ## Лабораторные работы
@@ -33,11 +33,11 @@
 ## Переключение между ветками
 
 ```bash
-git checkout lr1-feature-processing   # LR1
-git checkout lr2-feature-processing-ev # LR2
-git checkout lr3-multidimensional-search # LR3
-git checkout lr4-constrained-optimization # LR4
-git checkout rk1-data-processing # РК1
+git checkout lr1-feature-processing         # LR1
+git checkout lr2-feature-processing-ev      # LR2
+git checkout lr3-multidimensional-search    # LR3
+git checkout lr4-constrained-optimization   # LR4
+git checkout rk1-data-processing            # РК1
 ```
 
 ## GitHub Pages
