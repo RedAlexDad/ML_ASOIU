@@ -81,7 +81,7 @@ $$f(x) = \sum_{i=1}^{n-1} [a(x_i^2 - x_{i+1})^2 + b(x_i - 1)^2] + f_0$$
 │   ├── functions.py                 # Функции и ограничения
 │   ├── penalty_methods.py           # Методы штрафных функций
 │   ├── lagrange_methods.py          # Метод Лагранжа
-│   ├── projection_methods.py       # Метод проекции градиента
+│   ├── projection_methods.py        # Метод проекции градиента
 │   └── optimizer.py                 # Класс ConstrainedOptimizer
 ├── plots/                           # Графики
 ├── opt_lab_4.pdf                    # Методичка (основной)
