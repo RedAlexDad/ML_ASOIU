@@ -12,7 +12,8 @@ def train(
     agent: DQNAgent,
     episodes: int,
     batch_size: int,
-    seed: int
+    seed: int,
+    warmup_steps: int = 200
 ) -> Tuple[List[float], List[float], List[float]]:
     rewards_history = []
     losses = []
@@ -20,13 +21,19 @@ def train(
     
     start_time = datetime.datetime.now()
     
+    print(f"Начало обучения: {episodes} эпизодов, warmup={warmup_steps} шагов")
+    
+    total_steps = 0
+    
     for episode in range(episodes):
         state, _ = env.reset(seed=seed + episode)
         total_reward = 0
         episode_losses = []
         episode_q_values = []
+        steps = 0
+        max_steps = 500
         
-        while True:
+        while steps < max_steps:
             action = agent.select_action(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
@@ -38,12 +45,16 @@ def train(
                 q_vals = agent.q_network(state_tensor).numpy()[0]
                 episode_q_values.append(q_vals.max())
             
-            loss = agent.train_step(batch_size)
-            if loss is not None:
-                episode_losses.append(loss)
+            # Обучаем после warmup или когда достаточно данных
+            if total_steps >= warmup_steps or len(agent.buffer) >= batch_size:
+                loss = agent.train_step(batch_size)
+                if loss is not None:
+                    episode_losses.append(loss)
             
             total_reward += reward
             state = next_state
+            steps += 1
+            total_steps += 1
             
             if done:
                 break
@@ -66,9 +77,8 @@ def train(
             q_values_mean=current_q
         )
         
-        if (episode + 1) % 50 == 0:
-            mlflow.log_metric("avg_reward_50", avg_reward, step=episode)
-            print(f"Episode {episode+1}/{episodes} | Avg Reward: {avg_reward:.1f} | Epsilon: {agent.epsilon:.3f}")
+        if (episode + 1) % 10 == 0:
+            print(f"Episode {episode+1}/{episodes} | Reward: {total_reward:.1f} | Steps: {steps} | Epsilon: {agent.epsilon:.3f}")
     
     total_time = (datetime.datetime.now() - start_time).total_seconds()
     mlflow.log_metric("total_training_time", total_time)

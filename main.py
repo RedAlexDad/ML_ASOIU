@@ -16,16 +16,17 @@ from dqn import DQNAgent
 from src import get_env_info, make_env, train, evaluate, plot_results
 
 
-EPISODES = 10
-BATCH_SIZE = 64
+EPISODES = 300
+BATCH_SIZE = 32
 HIDDEN_DIM = 128
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.003
 GAMMA = 0.99
-EPSILON_DECAY = 0.995
+EPSILON_DECAY = 0.98
 EPSILON_MIN = 0.01
-TARGET_UPDATE = 100
+TARGET_UPDATE = 50
 BUFFER_CAPACITY = 10000
 SEED = 42
+WARMUP_STEPS = 200
 
 np.random.seed(SEED)
 torch.manual_seed(SEED)
@@ -61,7 +62,7 @@ def main():
         )
         
         print("Начало обучения...")
-        rewards, losses, q_values = train(env, agent, EPISODES, BATCH_SIZE, SEED)
+        rewards, losses, q_values = train(env, agent, EPISODES, BATCH_SIZE, SEED, WARMUP_STEPS)
         
         agent.save('dqn_model.pth')
         agent.log_model(artifact_path="dqn_model")
