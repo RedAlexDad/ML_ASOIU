@@ -4,20 +4,75 @@
 
 import gymnasium as gym
 from dqn import DQNAgent
+from dqn.network import QNetwork, DuelingQNetwork, QNetworkBN, QNetworkLSTM
 import argparse
 import time
+import torch
+import mlflow
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='DQN Demo - визуализация агента')
     parser.add_argument('--model', type=str, default='dqn_model.pth', help='Путь к модели')
+    parser.add_argument('--network', type=str, default='qnetwork',
+                        choices=['qnetwork', 'dueling', 'bn', 'lstm'],
+                        help='Тип архитектуры сети')
     parser.add_argument('--episodes', type=int, default=3, help='Количество эпизодов')
     parser.add_argument('--delay', type=float, default=0.02, help='Задержка между шагами (сек)')
     parser.add_argument('--hidden-dim', type=int, default=128, help='Размер скрытого слоя')
     return parser.parse_args()
 
 
+def create_network(network_type: str, state_dim: int, action_dim: int, hidden_dim: int):
+    """Создать сеть нужного типа."""
+    if network_type == 'lstm':
+        return QNetworkLSTM(state_dim, action_dim, hidden_dim)
+    elif network_type == 'dueling':
+        return DuelingQNetwork(state_dim, action_dim, hidden_dim)
+    elif network_type == 'bn':
+        return QNetworkBN(state_dim, action_dim, hidden_dim)
+    else:
+        return QNetwork(state_dim, action_dim, hidden_dim)
+
+
+def load_model_for_demo(path: str, hidden_dim: int, network_type: str) -> DQNAgent:
+    """Загрузить модель - поддерживает как локальные файлы, так и MLflow."""
+    state_dim, action_dim = 4, 2
+    
+    q_network = create_network(network_type, state_dim, action_dim, hidden_dim)
+    target_network = create_network(network_type, state_dim, action_dim, hidden_dim)
+    
+    agent = DQNAgent(state_dim=state_dim, action_dim=action_dim, hidden_dim=hidden_dim)
+    agent.q_network = q_network
+    agent.target_network = target_network
+    
+    optimizer = torch.optim.Adam(agent.q_network.parameters(), lr=0.003)
+    agent.optimizer = optimizer
+    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    agent.device = device
+    
+    if 'mlruns' in path or 'mlflow' in path.lower():
+        print("  Загрузка через MLflow...")
+        mlflow_path = path
+        if path.endswith('model.pth'):
+            mlflow_path = path.replace('/artifacts/data/model.pth', '/artifacts')
+        print(f"  MLflow path: {mlflow_path}")
+        model = mlflow.pytorch.load_model(mlflow_path)
+        model.to(device)
+        agent.q_network.to(device)
+        agent.target_network.to(device)
+        agent.q_network.load_state_dict(model.state_dict())
+        agent.target_network.load_state_dict(model.state_dict())
+    else:
+        agent.load(path)
+    
+    return agent
+
+
 def play(agent, env, episodes=3, delay=0.02):
+    agent.q_network.eval()
+    
     for episode in range(episodes):
         state, _ = env.reset()
         total_reward = 0
@@ -52,8 +107,8 @@ if __name__ == '__main__':
     args = parse_args()
     
     print(f"Загрузка модели: {args.model}")
-    agent = DQNAgent(state_dim=4, action_dim=2, hidden_dim=args.hidden_dim)
-    agent.load(args.model)
+    print(f"Тип сети: {args.network}")
+    agent = load_model_for_demo(args.model, args.hidden_dim, args.network)
     
     print("Создание окружения с визуализацией...")
     env = gym.make('CartPole-v1', render_mode='human')
