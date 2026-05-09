@@ -1,4 +1,4 @@
-.PHONY: help install train train-qnetwork train-dueling train-bn train-all demo test clean mlflow
+.PHONY: help install train train-qnetwork train-dueling train-bn train-all demo test clean mlflow mlflow-migrate
 
 GREEN := $(shell tput setaf 2)
 YELLOW := $(shell tput setaf 3)
@@ -12,6 +12,7 @@ help:
 	@echo "  $(YELLOW)make install$(RESET)                - Установить зависимости"
 	@echo "  $(YELLOW)make train$(RESET)                  - Обучить агента (базовый DQN, 50 эпизодов)"
 	@echo "  $(YELLOW)make mlflow$(RESET)                 - Запустить MLflow UI"
+	@echo "  $(YELLOW)make mlflow-migrate$(RESET)         - Мигрировать БД MLflow"
 	@echo "  $(YELLOW)make demo$(RESET)                   - Запустить визуализацию"
 	@echo "  $(YELLOW)make test$(RESET)                   - Быстрый тест агента"
 	@echo "  $(YELLOW)make clean$(RESET)                  - Очистить временные файлы"
@@ -71,6 +72,10 @@ demo:
 
 test:
 	@python3 -c "from dqn import DQNAgent; agent = DQNAgent(state_dim=4, action_dim=2); agent.load('$(MODEL)'); print('$(GREEN)Модель загружена OK$(RESET)')"
+
+mlflow-migrate:
+	@echo "$(GREEN)Миграция базы данных MLflow...$(RESET)"
+	mlflow db upgrade sqlite:///mlflow.db
 
 mlflow:
 	@echo "$(GREEN)Запуск MLflow UI...$(RESET)"
