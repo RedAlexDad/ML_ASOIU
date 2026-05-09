@@ -60,8 +60,6 @@ def plot_results(
     plt.grid(True)
     plt.savefig(f'{save_path}/training_progress.png', dpi=150)
     plt.close()
-    
-    print(f"Графики сохранены в {save_path}/")
 
 
 def plot_smoothed(rewards: List[float], window: int = 50, save_path: str = 'plots') -> None:

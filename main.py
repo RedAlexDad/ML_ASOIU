@@ -161,8 +161,6 @@ def main():
     if use_mlflow:
         mlflow.pytorch.log_model(agent.q_network, artifact_path='q_network')  # type: ignore
     
-    plot_results(rewards, losses, q_values, save_path='plots')
-    
     if use_mlflow:
         mlflow.log_artifact('plots/training_analysis.png')
         mlflow.log_artifact('plots/training_progress.png')

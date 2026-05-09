@@ -20,7 +20,6 @@ def evaluate(env: gym.Env, agent: DQNAgent, episodes: int = 20) -> Dict[str, flo
         state, _ = env.reset()
         total_reward = 0
         steps = 0
-        episode_q = []
         
         while True:
             action = agent.select_action(state, training=False)
@@ -36,7 +35,7 @@ def evaluate(env: gym.Env, agent: DQNAgent, episodes: int = 20) -> Dict[str, flo
         
         eval_rewards.append(total_reward)
         episode_lengths.append(steps)
-        eval_q_values.append(np.mean(episode_q))
+        eval_q_values.append(0.0)
     
     results = {
         "mean_reward": np.mean(eval_rewards),
