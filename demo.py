@@ -107,6 +107,8 @@ def load_model_for_demo(path: str, hidden_dim: int, network_type: str) -> DQNAge
             try:
                 agent.q_network.load_state_dict(model.state_dict())
                 agent.target_network.load_state_dict(model.state_dict())
+                agent.q_network.to(device)
+                agent.target_network.to(device)
             except RuntimeError as e:
                 detected_type = detect_network_type(path)
                 if detected_type != network_type:
@@ -120,6 +122,8 @@ def load_model_for_demo(path: str, hidden_dim: int, network_type: str) -> DQNAge
                     agent.target_network.to(device)
                     agent.q_network.load_state_dict(model.state_dict())
                     agent.target_network.load_state_dict(model.state_dict())
+                    agent.q_network.to(device)
+                    agent.target_network.to(device)
                 else:
                     raise
     else:
