@@ -14,7 +14,7 @@ import os
 import datetime
 
 from dqn import DQNAgent
-from src.visualization import plot_results
+from src.visualization import plot_results, plot_detailed_analysis
 from src.train import train as train_agent
 from src.evaluate import evaluate as evaluate_agent
 
@@ -24,6 +24,42 @@ try:
     MLFLOW_AVAILABLE = True
 except ImportError:
     MLFLOW_AVAILABLE = False
+
+
+def log_model_info(agent: DQNAgent, env: gym.Env, device: torch.device, args) -> dict:
+    from torchinfo import summary
+    
+    model_summary = summary(agent.q_network, input_size=(1, 4), verbose=False)
+    
+    info = {
+        "environment": {
+            "name": "CartPole-v1",
+            "observation_space": str(env.observation_space),
+            "action_space": str(env.action_space),
+        },
+        "model": {
+            "state_dim": 4,
+            "action_dim": agent.action_dim,
+            "hidden_dim": args.hidden_dim,
+            "total_parameters": model_summary.total_params,
+            "trainable_parameters": model_summary.trainable_params,
+        },
+        "hyperparameters": {
+            "lr": args.lr,
+            "gamma": args.gamma,
+            "epsilon": 1.0,
+            "epsilon_decay": args.epsilon_decay,
+            "epsilon_min": args.epsilon_min,
+            "buffer_capacity": args.buffer_capacity,
+        },
+        "system": {
+            "device": str(device),
+            "cuda_available": torch.cuda.is_available(),
+            "cuda_device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+            "torch_version": torch.__version__,
+        },
+    }
+    return info
 
 
 def parse_args():
@@ -135,6 +171,50 @@ def main():
                 break
     print(f"Буфер: {len(agent.buffer)} переходов")
     
+    if use_mlflow:
+        from torchinfo import summary
+        
+        print("\nАрхитектура модели:")
+        summary(agent.q_network, input_size=(1, 4), col_names=["output_size", "num_params"], verbose=True)
+        
+        model_summary = summary(agent.q_network, input_size=(1, 4), verbose=False)
+        
+        import json
+        model_info = {
+            "environment": {"name": "CartPole-v1"},
+            "model": {
+                "state_dim": 4,
+                "action_dim": agent.action_dim,
+                "hidden_dim": args.hidden_dim,
+                "total_parameters": model_summary.total_params,
+                "trainable_parameters": model_summary.trainable_params,
+            },
+            "hyperparameters": {
+                "lr": args.lr,
+                "gamma": args.gamma,
+                "epsilon_decay": args.epsilon_decay,
+                "epsilon_min": args.epsilon_min,
+                "buffer_capacity": args.buffer_capacity,
+            },
+            "system": {
+                "device": str(device),
+                "cuda_available": torch.cuda.is_available(),
+                "cuda_device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+                "torch_version": torch.__version__,
+            },
+        }
+        
+        with open('model_info.json', 'w') as f:
+            json.dump(model_info, f, indent=2)
+        mlflow.log_artifact('model_info.json')
+        
+        print("\nИнформация о модели:")
+        print(f"  Устройство: {model_info['system']['device']}")
+        if model_info['system']['cuda_device_name']:
+            print(f"  GPU: {model_info['system']['cuda_device_name']}")
+        print(f"  Архитектура: QNetwork({model_info['model']['state_dim']} -> {model_info['model']['hidden_dim']} -> {model_info['model']['action_dim']})")
+        print(f"  Буфер: {model_info['hyperparameters']['buffer_capacity']}")
+    
     print(f"\nПараметры: episodes={args.episodes}, batch={args.batch_size}, lr={args.lr}")
     
     start_time = datetime.datetime.now()
@@ -162,8 +242,11 @@ def main():
         mlflow.pytorch.log_model(agent.q_network, artifact_path='q_network')  # type: ignore
     
     if use_mlflow:
+        plot_results(rewards, losses, q_values, save_path='plots')
+        plot_detailed_analysis(rewards, losses, q_values, save_path='plots')
         mlflow.log_artifact('plots/training_analysis.png')
         mlflow.log_artifact('plots/training_progress.png')
+        mlflow.log_artifact('plots/detailed_analysis.png')
     
     print("\nОценка агента...")
     results = evaluate_agent(env, agent, episodes=args.eval_episodes)
