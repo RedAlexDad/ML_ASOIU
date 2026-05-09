@@ -67,7 +67,7 @@ def parse_args():
     parser.add_argument('--batch-size', type=int, default=32, help='Размер батча')
     parser.add_argument('--hidden-dim', type=int, default=128, help='Размер скрытого слоя')
     parser.add_argument('--network', type=str, default='qnetwork', 
-                        choices=['qnetwork', 'dueling', 'bn'],
+                        choices=['qnetwork', 'dueling', 'bn', 'lstm'],
                         help='Тип сети: qnetwork (базовая), dueling (Dueling DQN), bn (с BatchNorm)')
     parser.add_argument('--lr', type=float, default=0.003, help='Скорость обучения')
     parser.add_argument('--gamma', type=float, default=0.99, help='Коэффициент дисконтирования')

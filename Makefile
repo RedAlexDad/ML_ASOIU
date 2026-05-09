@@ -20,7 +20,8 @@ help:
 	@echo "  $(YELLOW)make train-qnetwork$(RESET)         - Базовая DQN (3 слоя, ReLU)"
 	@echo "  $(YELLOW)make train-dueling$(RESET)          - Dueling DQN (разделение V и A)"
 	@echo "  $(YELLOW)make train-bn$(RESET)               - DQN с BatchNorm и Dropout"
-	@echo "  $(YELLOW)make train-all$(RESET)              - Обучить все 3 модели для сравнения"
+	@echo "  $(YELLOW)make train-lstm$(RESET)             - DQN с LSTM (память)"
+	@echo "  $(YELLOW)make train-all$(RESET)              - Обучить все 4 модели для сравнения"
 	@echo ""
 	@echo "$(GREEN)Параметры обучения:$(RESET)"
 	@echo "  EPISODES, BATCH_SIZE, LR, GAMMA, EPSILON_DECAY, EPSILON_MIN"
@@ -44,6 +45,10 @@ train-bn:
 	@echo "$(GREEN)Обучение DQN с BatchNorm...$(RESET)"
 	python3 main.py --network bn --episodes $(EPISODES) --batch-size $(BATCH_SIZE) --lr $(LR) --gamma $(GAMMA) --hidden-dim $(HIDDEN_DIM)
 
+train-lstm:
+	@echo "$(GREEN)Обучение DQN с LSTM...$(RESET)"
+	python3 main.py --network lstm --episodes $(EPISODES) --batch-size $(BATCH_SIZE) --lr $(LR) --gamma $(GAMMA) --hidden-dim $(HIDDEN_DIM)
+
 train-all:
 	@echo "$(GREEN)Обучение всех архитектур для сравнения...$(RESET)"
 	@echo ""
@@ -55,6 +60,9 @@ train-all:
 	@echo ""
 	@echo "$(YELLOW)=== 3. QNetwork с BatchNorm ===$(RESET)"
 	python3 main.py --network bn --episodes 100 --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
+	@echo ""
+	@echo "$(YELLOW)=== 4. QNetwork с LSTM ===$(RESET)"
+	python3 main.py --network lstm --episodes 100 --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
 	@echo ""
 	@echo "$(GREEN)Обучение всех моделей завершено!$(RESET)"
 

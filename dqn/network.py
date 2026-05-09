@@ -180,3 +180,51 @@ class QNetworkBN(nn.Module):
         x = self.dropout(x)
         
         return self.fc3(x)
+
+
+class QNetworkLSTM(nn.Module):
+    """
+    QNetwork с LSTM для запоминания последовательностей.
+    
+    LSTM преимущества:
+    - Запоминает временные зависимости между состояниями
+    - Лучше для частично наблюдаемых сред (POMDP)
+    - Может учить паттерны в последовательностях
+    
+    Вход: последовательность состояний (seq_len, state_dim)
+    Выход: Q-значения для каждого действия
+    """
+    
+    def __init__(self, state_dim: int, action_dim: int, hidden_dim: int = 128, num_layers: int = 1) -> None:
+        super(QNetworkLSTM, self).__init__()
+        
+        self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
+        
+        self.lstm = nn.LSTM(
+            input_size=state_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=True
+        )
+        
+        self.fc = nn.Linear(hidden_dim, action_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Прямой проход через сеть.
+        
+        Args:
+            x: Тензор формы (batch_size, seq_len, state_dim)
+            
+        Returns:
+            Тензор Q-значений формы (batch_size, action_dim)
+        """
+        if x.dim() == 2:
+            x = x.unsqueeze(1)
+        
+        lstm_out, (h_n, c_n) = self.lstm(x)
+        
+        last_output = lstm_out[:, -1, :]
+        
+        return self.fc(last_output)

@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 
 import mlflow  # type: ignore
 
-from dqn.network import QNetwork
+from dqn.network import QNetwork, DuelingQNetwork, QNetworkBN, QNetworkLSTM
 from dqn.buffer import ReplayBuffer
 
 
@@ -70,13 +70,12 @@ class DQNAgent:
             device: Устройство для вычислений (CPU/CUDA)
             experiment_name: Имя эксперимента для MLflow
         """
-        from dqn.network import QNetwork, DuelingQNetwork, QNetworkBN
-        
         # Выбор архитектуры сети
         network_classes = {
             'qnetwork': QNetwork,
             'dueling': DuelingQNetwork,
-            'bn': QNetworkBN
+            'bn': QNetworkBN,
+            'lstm': QNetworkLSTM
         }
         NetworkClass = network_classes.get(network_type, QNetwork)
         
