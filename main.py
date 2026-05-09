@@ -17,7 +17,6 @@ from dqn import DQNAgent
 from src.visualization import plot_results, plot_detailed_analysis
 from src.train import train as train_agent
 from src.evaluate import evaluate as evaluate_agent
-
 try:
     import mlflow
     import mlflow.pytorch  # type: ignore
@@ -67,6 +66,9 @@ def parse_args():
     parser.add_argument('--episodes', type=int, default=50, help='Количество эпизодов')
     parser.add_argument('--batch-size', type=int, default=32, help='Размер батча')
     parser.add_argument('--hidden-dim', type=int, default=128, help='Размер скрытого слоя')
+    parser.add_argument('--network', type=str, default='qnetwork', 
+                        choices=['qnetwork', 'dueling', 'bn'],
+                        help='Тип сети: qnetwork (базовая), dueling (Dueling DQN), bn (с BatchNorm)')
     parser.add_argument('--lr', type=float, default=0.003, help='Скорость обучения')
     parser.add_argument('--gamma', type=float, default=0.99, help='Коэффициент дисконтирования')
     parser.add_argument('--epsilon-decay', type=float, default=0.98, help='Затухание epsilon')
@@ -124,8 +126,12 @@ def main():
     use_mlflow = args.mlflow and not args.no_mlflow and MLFLOW_AVAILABLE
     
     if use_mlflow:
-        mlflow.set_experiment('DQN_CartPole_Experiment')
-        mlflow.start_run(run_name=f"dqn_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}")
+        mlflow.set_experiment('DQN_CartPole_Comparison')
+        active = mlflow.active_run()
+        if active is None:
+            mlflow.start_run(run_name=f"{args.network}_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}")
+        else:
+            mlflow.start_run(run_id=active.info.run_id)
         log_params(args)
         print(f"{'='*50}")
         run = mlflow.active_run()
@@ -137,6 +143,7 @@ def main():
     
     if use_mlflow:
         mlflow.log_param('device', str(device))
+        mlflow.log_param('network', args.network)
     
     env = gym.make('CartPole-v1')
     obs_space = env.observation_space
@@ -149,6 +156,7 @@ def main():
         state_dim=int(obs_shape[0]),  # type: ignore
         action_dim=action_dim,
         hidden_dim=args.hidden_dim,
+        network_type=args.network,
         lr=args.lr,
         gamma=args.gamma,
         epsilon_decay=args.epsilon_decay,
@@ -204,9 +212,7 @@ def main():
             },
         }
         
-        with open('model_info.json', 'w') as f:
-            json.dump(model_info, f, indent=2)
-        mlflow.log_artifact('model_info.json')
+        mlflow.log_dict(model_info, 'model_info.json')
         
         print("\nИнформация о модели:")
         print(f"  Устройство: {model_info['system']['device']}")
@@ -234,16 +240,7 @@ def main():
     
     if use_mlflow:
         mlflow.log_metric('training_time', training_time)
-    
-    agent.save(args.model_path)
-    print(f"Модель сохранена: {args.model_path}")
-    
-    if use_mlflow:
-        mlflow.pytorch.log_model(agent.q_network, artifact_path='q_network')  # type: ignore
-    
-    if use_mlflow:
-        plot_results(rewards, losses, q_values, save_path='plots')
-        plot_detailed_analysis(rewards, losses, q_values, save_path='plots')
+        mlflow.pytorch.log_model(agent.q_network, artifact_path=f'{args.network}_q_network')  # type: ignore
         mlflow.log_artifact('plots/training_analysis.png')
         mlflow.log_artifact('plots/training_progress.png')
         mlflow.log_artifact('plots/detailed_analysis.png')
