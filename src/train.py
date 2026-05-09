@@ -43,10 +43,12 @@ def train(
             
             agent.store_transition(state, action, float(reward), next_state, done)
             
+            agent.q_network.eval()
             with torch.no_grad():
                 state_tensor = torch.FloatTensor(state).unsqueeze(0).to(agent.device)
                 q_vals = agent.q_network(state_tensor).cpu().numpy()[0]
                 episode_q_values.append(q_vals.max())
+            agent.q_network.train()
             
             # Обучаем после warmup или когда достаточно данных
             if total_steps >= warmup_steps or len(agent.buffer) >= batch_size:

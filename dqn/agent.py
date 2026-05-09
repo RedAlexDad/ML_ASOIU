@@ -154,10 +154,13 @@ class DQNAgent:
             return np.random.randint(self.action_dim)
         
         # Эксплуатация: выбираем действие с максимальным Q-значением
+        self.q_network.eval()
         with torch.no_grad():
             state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
             q_values = self.q_network(state_tensor)
-            return q_values.argmax().item()
+            action = q_values.argmax().item()
+        self.q_network.train()
+        return action
 
     def store_transition(
         self,
