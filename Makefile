@@ -53,16 +53,16 @@ train-all:
 	@echo "$(GREEN)Обучение всех архитектур для сравнения...$(RESET)"
 	@echo ""
 	@echo "$(YELLOW)=== 1. QNetwork (базовый DQN) ===$(RESET)"
-	python3 main.py --network qnetwork --episodes 100 --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
+	python3 main.py --network qnetwork --episodes $(EPISODES) --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
 	@echo ""
 	@echo "$(YELLOW)=== 2. DuelingQNetwork ===$(RESET)"
-	python3 main.py --network dueling --episodes 100 --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
+	python3 main.py --network dueling --episodes $(EPISODES) --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
 	@echo ""
 	@echo "$(YELLOW)=== 3. QNetwork с BatchNorm ===$(RESET)"
-	python3 main.py --network bn --episodes 100 --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
+	python3 main.py --network bn --episodes $(EPISODES) --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
 	@echo ""
 	@echo "$(YELLOW)=== 4. QNetwork с LSTM ===$(RESET)"
-	python3 main.py --network lstm --episodes 100 --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
+	python3 main.py --network lstm --episodes $(EPISODES) --batch-size 32 --lr 0.003 --gamma 0.99 --hidden-dim 128
 	@echo ""
 	@echo "$(GREEN)Обучение всех моделей завершено!$(RESET)"
 
