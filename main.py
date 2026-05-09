@@ -146,7 +146,7 @@ def main():
     print(f"Состояние: {obs_shape}, Действий: {action_dim}")
     
     agent = DQNAgent(
-        state_dim=int(obs_shape[0]),
+        state_dim=int(obs_shape[0]),  # type: ignore
         action_dim=action_dim,
         hidden_dim=args.hidden_dim,
         lr=args.lr,

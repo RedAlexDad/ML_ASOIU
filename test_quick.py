@@ -27,7 +27,7 @@ for _ in range(10):
         action = env.action_space.sample()
         next_state, reward, terminated, truncated, _ = env.step(action)
         done = terminated or truncated
-        agent.store_transition(state, action, reward, next_state, done)
+        agent.store_transition(state, action, float(reward), next_state, done)
         state = next_state
         if done:
             break
@@ -37,19 +37,19 @@ print(f"Buffer: {len(agent.buffer)}")
 print("Обучение: 100 эпизодов")
 for episode in range(100):
     state, _ = env.reset()
-    total_reward = 0
+    total_reward = 0.0
     
     while total_reward < 500:
         action = agent.select_action(state)
         next_state, reward, terminated, truncated, _ = env.step(action)
         done = terminated or truncated
         
-        agent.store_transition(state, action, reward, next_state, done)
+        agent.store_transition(state, action, float(reward), next_state, done)
         
         if len(agent.buffer) >= 32:
             agent.train_step(32)
         
-        total_reward += reward
+        total_reward += float(reward)
         state = next_state
         
         if done:
@@ -62,12 +62,12 @@ print("\nОценка:")
 eval_rewards = []
 for _ in range(5):
     state, _ = env.reset()
-    total_reward = 0
+    total_reward = 0.0
     while True:
         action = agent.select_action(state, training=False)
         next_state, reward, terminated, truncated, _ = env.step(action)
         done = terminated or truncated
-        total_reward += reward
+        total_reward += float(reward)
         state = next_state
         if done:
             break

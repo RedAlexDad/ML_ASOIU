@@ -1,0 +1,23 @@
+artifact_path: /home/redalexdad/GitHub/ML_ASOIU/mlruns/1/models/m-a627e700af2a4bfb9c4c904d7dfee06e/artifacts
+flavors:
+  python_function:
+    config:
+      device: null
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pytorch
+    pickle_module_name: mlflow.pytorch.pickle_module
+    python_version: 3.12.3
+  pytorch:
+    code: null
+    model_data: data
+    pytorch_version: 2.9.1+cu128
+mlflow_version: 3.10.1
+model_id: m-a627e700af2a4bfb9c4c904d7dfee06e
+model_size_bytes: 73433
+model_uuid: m-a627e700af2a4bfb9c4c904d7dfee06e
+prompts: null
+run_id: 711bbafc5ad34413b39aacad630ec0e1
+utc_time_created: '2026-05-09 12:40:06.041619'
