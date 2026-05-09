@@ -41,7 +41,7 @@ def train(
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
             
-            agent.store_transition(state, action, reward, next_state, done)
+            agent.store_transition(state, action, float(reward), next_state, done)
             
             with torch.no_grad():
                 state_tensor = torch.FloatTensor(state).unsqueeze(0).to(agent.device)

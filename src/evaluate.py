@@ -27,12 +27,7 @@ def evaluate(env: gym.Env, agent: DQNAgent, episodes: int = 20) -> Dict[str, flo
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
             
-            with torch.no_grad():
-                state_tensor = torch.FloatTensor(state).unsqueeze(0).to(agent.device)
-                q_vals = agent.q_network(state_tensor).cpu().numpy()[0]
-                episode_q.append(q_vals.max())
-            
-            total_reward += reward
+            total_reward += float(reward)
             steps += 1
             state = next_state
             

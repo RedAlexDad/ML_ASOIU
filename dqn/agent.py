@@ -2,9 +2,19 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
-from typing import Optional, Dict, Any
-import mlflow
-import mlflow.pytorch
+from typing import Optional, Dict, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import mlflow
+    import mlflow.pytorch
+
+import mlflow as mlflow_module
+mlflow = mlflow_module
+try:
+    import mlflow.pytorch
+except Exception:
+    mlflow.pytorch = None
+
 from dqn.network import QNetwork
 from dqn.buffer import ReplayBuffer
 

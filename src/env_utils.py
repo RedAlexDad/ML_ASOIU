@@ -3,11 +3,12 @@ from typing import Dict, Any
 
 
 def get_env_info(env: gym.Env) -> Dict[str, Any]:
+    obs = env.observation_space
     return {
-        "state_space": env.observation_space.shape,
-        "action_space": env.action_space.n,
-        "state_high": env.observation_space.high.tolist(),
-        "state_low": env.observation_space.low.tolist(),
+        "state_space": obs.shape,
+        "action_space": int(env.action_space.n),
+        "state_high": obs.high.tolist() if hasattr(obs, 'high') else [],
+        "state_low": obs.low.tolist() if hasattr(obs, 'low') else [],
     }
 
 

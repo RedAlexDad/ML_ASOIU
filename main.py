@@ -92,7 +92,8 @@ def main():
         mlflow.start_run(run_name=f"dqn_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}")
         log_params(args)
         print(f"{'='*50}")
-        print(f"MLflow включен: {mlflow.active_run().info.run_id}")
+        run = mlflow.active_run()
+        print(f"MLflow включен: {run.info.run_id if run else 'N/A'}")
         print(f"{'='*50}")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -102,11 +103,13 @@ def main():
         mlflow.log_param('device', str(device))
     
     env = gym.make('CartPole-v1')
-    print(f"Состояние: {env.observation_space.shape}, Действий: {env.action_space.n}")
+    obs_shape = env.observation_space.shape
+    action_dim = int(env.action_space.n)
+    print(f"Состояние: {obs_shape}, Действий: {action_dim}")
     
     agent = DQNAgent(
-        state_dim=env.observation_space.shape[0],
-        action_dim=env.action_space.n,
+        state_dim=int(obs_shape[0]),
+        action_dim=action_dim,
         hidden_dim=args.hidden_dim,
         lr=args.lr,
         gamma=args.gamma,
@@ -154,7 +157,7 @@ def main():
     print(f"Модель сохранена: {args.model_path}")
     
     if use_mlflow:
-        mlflow.pytorch.log_model(agent.q_network, 'q_network')
+        mlflow.pytorch.log_model(agent.q_network, artifact_path='q_network')
     
     plot_results(rewards, losses, q_values, save_path='plots')
     
