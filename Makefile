@@ -36,6 +36,7 @@ test:
 
 mlflow:
 	@echo "$(GREEN)Запуск MLflow UI...$(RESET)"
+	@echo "$(YELLOW)Откройте: http://127.0.0.1:5000/#/experiments/1/runs?columns=metrics.episode_reward,metrics.episode_loss,metrics.episode_q,metrics.epsilon$(RESET)"
 	mlflow ui --host 127.0.0.1 --port 5000
 
 clean:
