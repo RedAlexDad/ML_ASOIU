@@ -68,7 +68,7 @@ train-all:
 	@echo "$(GREEN)Обучение всех моделей завершено!$(RESET)"
 
 demo:
-	python3 demo.py --model $(MODEL) --episodes $(EPISODES) --delay $(DELAY)
+	python3 demo.py --model $(MODEL) --episodes $(DEMO_EPISODES) --delay $(DELAY)
 
 test:
 	@python3 -c "from dqn import DQNAgent; agent = DQNAgent(state_dim=4, action_dim=2); agent.load('$(MODEL)'); print('$(GREEN)Модель загружена OK$(RESET)')"
@@ -99,3 +99,4 @@ WARMUP_STEPS ?= 1000
 NETWORK ?= qnetwork
 MODEL ?= dqn_model.pth
 DELAY ?= 0.02
+DEMO_EPISODES ?= 3
