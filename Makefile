@@ -9,17 +9,22 @@ help:
 	@echo "$(BLUE)LR5: DQN (Deep Q-Network)$(RESET) - Обучение с подкреплением"
 	@echo ""
 	@echo "$(GREEN)Доступные команды:$(RESET)"
-	@echo "  $(YELLOW)make install$(RESET)   - Установить зависимости"
-	@echo "  $(YELLOW)make train$(RESET)     - Обучить агента"
-	@echo "  $(YELLOW)make demo$(RESET)      - Запустить визуализацию"
-	@echo "  $(YELLOW)make test$(RESET)      - Быстрый тест агента"
-	@echo "  $(YELLOW)make clean$(RESET)     - Очистить временные файлы"
+	@echo "  $(YELLOW)make install$(RESET)             - Установить зависимости"
+	@echo "  $(YELLOW)make train$(RESET)               - Обучить агента (по умолчанию 50 эпизодов)"
+	@echo "  $(YELLOW)make train EPISODES=100$(RESET)  - Обучить с кастомными параметрами"
+	@echo "  $(YELLOW)make demo$(RESET)                - Запустить визуализацию"
+	@echo "  $(YELLOW)make test$(RESET)                 - Быстрый тест агента"
+	@echo "  $(YELLOW)make clean$(RESET)                - Очистить временные файлы"
+	@echo ""
+	@echo "$(GREEN)Параметры обучения:$(RESET)"
+	@echo "  EPISODES, BATCH_SIZE, LR, GAMMA, EPSILON_DECAY, EPSILON_MIN"
+	@echo "  HIDDEN_DIM, TARGET_UPDATE, BUFFER_CAPACITY, WARMUP_STEPS"
 
 install:
 	pip install -r requirements.txt
 
 train:
-	python3 main.py
+	python3 main.py --episodes $(EPISODES) --batch-size $(BATCH_SIZE) --lr $(LR) --gamma $(GAMMA) --hidden-dim $(HIDDEN_DIM) --warmup-steps $(WARMUP_STEPS)
 
 demo:
 	python3 demo.py
@@ -30,3 +35,10 @@ test:
 clean:
 	rm -rf plots/*.png dqn_model.pth __pycache__ dqn/__pycache__ src/__pycache__ .pytest_cache
 	@echo "$(GREEN)Очистка завершена$(RESET)"
+
+EPISODES ?= 50
+BATCH_SIZE ?= 32
+LR ?= 0.003
+GAMMA ?= 0.99
+HIDDEN_DIM ?= 128
+WARMUP_STEPS ?= 1000
