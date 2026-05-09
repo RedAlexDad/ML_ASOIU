@@ -22,6 +22,7 @@ class DQNAgent:
         epsilon_min: float = 0.01,
         target_update: int = 100,
         buffer_capacity: int = 10000,
+        device: Optional[torch.device] = None,
         experiment_name: str = "DQN_CartPole"
     ) -> None:
         
@@ -35,8 +36,12 @@ class DQNAgent:
         
         self.experiment_name = experiment_name
         
-        self.q_network = QNetwork(state_dim, action_dim, hidden_dim)
-        self.target_network = QNetwork(state_dim, action_dim, hidden_dim)
+        if device is None:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = device
+        
+        self.q_network = QNetwork(state_dim, action_dim, hidden_dim).to(self.device)
+        self.target_network = QNetwork(state_dim, action_dim, hidden_dim).to(self.device)
         self.target_network.load_state_dict(self.q_network.state_dict())
         self.target_network.eval()
         
@@ -64,7 +69,7 @@ class DQNAgent:
             return np.random.randint(self.action_dim)
         
         with torch.no_grad():
-            state_tensor = torch.FloatTensor(state).unsqueeze(0)
+            state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
             q_values = self.q_network(state_tensor)
             return q_values.argmax().item()
 
@@ -84,11 +89,11 @@ class DQNAgent:
         
         states, actions, rewards, next_states, dones = self.buffer.sample(batch_size)
         
-        states = torch.FloatTensor(states)
-        actions = torch.LongTensor(actions)
-        rewards = torch.FloatTensor(rewards)
-        next_states = torch.FloatTensor(next_states)
-        dones = torch.FloatTensor(dones)
+        states = torch.FloatTensor(states).to(self.device)
+        actions = torch.LongTensor(actions).to(self.device)
+        rewards = torch.FloatTensor(rewards).to(self.device)
+        next_states = torch.FloatTensor(next_states).to(self.device)
+        dones = torch.FloatTensor(dones).to(self.device)
         
         current_q = self.q_network(states).gather(1, actions.unsqueeze(1)).squeeze(1)
         
@@ -140,10 +145,17 @@ class DQNAgent:
         )
 
     def save(self, path: str) -> None:
+        q_network_cpu = self.q_network.cpu().state_dict()
+        target_network_cpu = self.target_network.cpu().state_dict()
+        optimizer_cpu = self.optimizer.state_dict()
+        
+        self.q_network.to(self.device)
+        self.target_network.to(self.device)
+        
         torch.save({
-            'q_network': self.q_network.state_dict(),
-            'target_network': self.target_network.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
+            'q_network': q_network_cpu,
+            'target_network': target_network_cpu,
+            'optimizer': optimizer_cpu,
             'epsilon': self.epsilon,
             'steps': self.steps,
         }, path)

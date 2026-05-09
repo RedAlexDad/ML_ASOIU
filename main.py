@@ -11,11 +11,19 @@ import torch
 import gymnasium as gym
 import argparse
 import os
+import datetime
 
 from dqn import DQNAgent
 from src.visualization import plot_results
 from src.train import train as train_agent
 from src.evaluate import evaluate as evaluate_agent
+
+try:
+    import mlflow
+    import mlflow.pytorch
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    MLFLOW_AVAILABLE = False
 
 
 def parse_args():
@@ -33,7 +41,42 @@ def parse_args():
     parser.add_argument('--warmup-steps', type=int, default=1000, help='Шаги warmup')
     parser.add_argument('--eval-episodes', type=int, default=10, help='Эпизоды для оценки')
     parser.add_argument('--model-path', type=str, default='dqn_model.pth', help='Путь для сохранения модели')
+    parser.add_argument('--mlflow', action='store_true', default=True, help='Включить MLflow логгирование')
+    parser.add_argument('--no-mlflow', action='store_true', help='Отключить MLflow логгирование')
     return parser.parse_args()
+
+
+def log_params(args):
+    mlflow.log_params({
+        'episodes': args.episodes,
+        'batch_size': args.batch_size,
+        'hidden_dim': args.hidden_dim,
+        'lr': args.lr,
+        'gamma': args.gamma,
+        'epsilon_decay': args.epsilon_decay,
+        'epsilon_min': args.epsilon_min,
+        'target_update': args.target_update,
+        'buffer_capacity': args.buffer_capacity,
+        'seed': args.seed,
+        'warmup_steps': args.warmup_steps,
+    })
+
+
+def log_metrics(rewards, losses, q_values, results):
+    mlflow.log_metric('train_mean_reward', np.mean(rewards))
+    mlflow.log_metric('train_max_reward', max(rewards))
+    mlflow.log_metric('train_min_reward', min(rewards))
+    
+    if losses:
+        mlflow.log_metric('train_mean_loss', np.mean(losses))
+    
+    if q_values:
+        mlflow.log_metric('train_mean_q', np.mean(q_values))
+    
+    mlflow.log_metric('eval_mean_reward', results['mean_reward'])
+    mlflow.log_metric('eval_max_reward', results['max_reward'])
+    mlflow.log_metric('eval_min_reward', results['min_reward'])
+    mlflow.log_metric('eval_std_reward', results['std_reward'])
 
 
 def main():
@@ -41,6 +84,22 @@ def main():
     
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
+    
+    use_mlflow = args.mlflow and not args.no_mlflow and MLFLOW_AVAILABLE
+    
+    if use_mlflow:
+        mlflow.set_experiment('DQN_CartPole_Experiment')
+        mlflow.start_run(run_name=f"dqn_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}")
+        log_params(args)
+        print(f"{'='*50}")
+        print(f"MLflow включен: {mlflow.active_run().info.run_id}")
+        print(f"{'='*50}")
+    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"Используется устройство: {device}")
+    
+    if use_mlflow:
+        mlflow.log_param('device', str(device))
     
     env = gym.make('CartPole-v1')
     print(f"Состояние: {env.observation_space.shape}, Действий: {env.action_space.n}")
@@ -54,7 +113,8 @@ def main():
         epsilon_decay=args.epsilon_decay,
         epsilon_min=args.epsilon_min,
         target_update=args.target_update,
-        buffer_capacity=args.buffer_capacity
+        buffer_capacity=args.buffer_capacity,
+        device=device
     )
     
     print("Warmup: заполнение буфера...")
@@ -72,25 +132,46 @@ def main():
     
     print(f"\nПараметры: episodes={args.episodes}, batch={args.batch_size}, lr={args.lr}")
     
+    start_time = datetime.datetime.now()
+    
     rewards, losses, q_values = train_agent(
         env=env,
         agent=agent,
         episodes=args.episodes,
         batch_size=args.batch_size,
         seed=args.seed,
-        warmup_steps=args.warmup_steps
+        warmup_steps=args.warmup_steps,
+        mlflow_logging=use_mlflow
     )
     
+    training_time = (datetime.datetime.now() - start_time).total_seconds()
+    print(f"\nВремя обучения: {training_time:.1f} сек")
+    
+    if use_mlflow:
+        mlflow.log_metric('training_time', training_time)
+    
     agent.save(args.model_path)
-    print(f"\nМодель сохранена: {args.model_path}")
+    print(f"Модель сохранена: {args.model_path}")
+    
+    if use_mlflow:
+        mlflow.pytorch.log_model(agent.q_network, 'q_network')
     
     plot_results(rewards, losses, q_values, save_path='plots')
+    
+    if use_mlflow:
+        mlflow.log_artifact('plots/training_analysis.png')
+        mlflow.log_artifact('plots/training_progress.png')
     
     print("\nОценка агента...")
     results = evaluate_agent(env, agent, episodes=args.eval_episodes)
     print(f"Средняя награда: {results['mean_reward']:.1f}")
     print(f"Максимум: {results['max_reward']}")
     print(f"Минимум: {results['min_reward']}")
+    
+    if use_mlflow:
+        log_metrics(rewards, losses, q_values, results)
+        mlflow.end_run()
+        print("\nMLflow логирование завершено")
     
     env.close()
     print("\nГотово!")

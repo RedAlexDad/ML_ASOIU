@@ -17,7 +17,8 @@ def train(
     episodes: int,
     batch_size: int,
     seed: int,
-    warmup_steps: int = 200
+    warmup_steps: int = 200,
+    mlflow_logging: bool = False
 ) -> Tuple[List[float], List[float], List[float]]:
     rewards_history = []
     losses = []
@@ -43,8 +44,8 @@ def train(
             agent.store_transition(state, action, reward, next_state, done)
             
             with torch.no_grad():
-                state_tensor = torch.FloatTensor(state).unsqueeze(0)
-                q_vals = agent.q_network(state_tensor).numpy()[0]
+                state_tensor = torch.FloatTensor(state).unsqueeze(0).to(agent.device)
+                q_vals = agent.q_network(state_tensor).cpu().numpy()[0]
                 episode_q_values.append(q_vals.max())
             
             # Обучаем после warmup или когда достаточно данных
@@ -73,5 +74,11 @@ def train(
         
         if (episode + 1) % 10 == 0:
             print(f"Episode {episode+1}/{episodes} | Reward: {total_reward:.1f} | Steps: {steps} | Epsilon: {agent.epsilon:.3f}")
+        
+        if mlflow_logging and mlflow:
+            mlflow.log_metric('episode_reward', total_reward, step=episode)
+            mlflow.log_metric('episode_loss', current_loss, step=episode)
+            mlflow.log_metric('episode_q', current_q, step=episode)
+            mlflow.log_metric('epsilon', agent.epsilon, step=episode)
     
     return rewards_history, losses, q_values_history

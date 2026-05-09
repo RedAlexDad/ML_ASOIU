@@ -28,8 +28,8 @@ def evaluate(env: gym.Env, agent: DQNAgent, episodes: int = 20) -> Dict[str, flo
             done = terminated or truncated
             
             with torch.no_grad():
-                state_tensor = torch.FloatTensor(state).unsqueeze(0)
-                q_vals = agent.q_network(state_tensor).numpy()[0]
+                state_tensor = torch.FloatTensor(state).unsqueeze(0).to(agent.device)
+                q_vals = agent.q_network(state_tensor).cpu().numpy()[0]
                 episode_q.append(q_vals.max())
             
             total_reward += reward
