@@ -240,10 +240,19 @@ def main():
     
     if use_mlflow:
         mlflow.log_metric('training_time', training_time)
-        mlflow.pytorch.log_model(agent.q_network, artifact_path=f'{args.network}_q_network')  # type: ignore
-        mlflow.log_artifact('plots/training_analysis.png')
-        mlflow.log_artifact('plots/training_progress.png')
-        mlflow.log_artifact('plots/detailed_analysis.png')
+        mlflow.pytorch.log_model(agent.q_network, artifact_path=f'{args.network}_q_network')
+    
+    temp_plots = '/tmp/mlflow_plots'
+    plot_results(rewards, losses, q_values, save_path=temp_plots)
+    plot_detailed_analysis(rewards, losses, q_values, save_path=temp_plots)
+    
+    if use_mlflow:
+        mlflow.log_artifact(f'{temp_plots}/training_analysis.png')
+        mlflow.log_artifact(f'{temp_plots}/training_progress.png')
+        mlflow.log_artifact(f'{temp_plots}/detailed_analysis.png')
+    
+    import shutil
+    shutil.rmtree(temp_plots, ignore_errors=True)
     
     print("\nОценка агента...")
     results = evaluate_agent(env, agent, episodes=args.eval_episodes)
