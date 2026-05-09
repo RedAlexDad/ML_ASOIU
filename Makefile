@@ -29,7 +29,7 @@ train:
 	python3 main.py --episodes $(EPISODES) --batch-size $(BATCH_SIZE) --lr $(LR) --gamma $(GAMMA) --hidden-dim $(HIDDEN_DIM) --warmup-steps $(WARMUP_STEPS) $(if $(NO_MLFLOW),--no-mlflow,)
 
 demo:
-	python3 demo.py
+	python3 demo.py --model $(MODEL) --episodes $(EPISODES) --delay $(DELAY)
 
 test:
 	@python3 -c "from dqn import DQNAgent; agent = DQNAgent(state_dim=4, action_dim=2); agent.load('dqn_model.pth'); print('$(GREEN)Модель загружена OK$(RESET)')"
@@ -48,3 +48,5 @@ LR ?= 0.003
 GAMMA ?= 0.99
 HIDDEN_DIM ?= 128
 WARMUP_STEPS ?= 1000
+MODEL ?= dqn_model.pth
+DELAY ?= 0.02

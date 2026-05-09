@@ -4,7 +4,17 @@
 
 import gymnasium as gym
 from dqn import DQNAgent
+import argparse
 import time
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='DQN Demo - визуализация агента')
+    parser.add_argument('--model', type=str, default='dqn_model.pth', help='Путь к модели')
+    parser.add_argument('--episodes', type=int, default=3, help='Количество эпизодов')
+    parser.add_argument('--delay', type=float, default=0.02, help='Задержка между шагами (сек)')
+    parser.add_argument('--hidden-dim', type=int, default=128, help='Размер скрытого слоя')
+    return parser.parse_args()
 
 
 def play(agent, env, episodes=3, delay=0.02):
@@ -39,12 +49,14 @@ def play(agent, env, episodes=3, delay=0.02):
 
 
 if __name__ == '__main__':
-    print("Загрузка модели...")
-    agent = DQNAgent(state_dim=4, action_dim=2, hidden_dim=128)
-    agent.load('dqn_model.pth')
+    args = parse_args()
+    
+    print(f"Загрузка модели: {args.model}")
+    agent = DQNAgent(state_dim=4, action_dim=2, hidden_dim=args.hidden_dim)
+    agent.load(args.model)
     
     print("Создание окружения с визуализацией...")
     env = gym.make('CartPole-v1', render_mode='human')
     
-    print("\nДемонстрация игры:")
-    play(agent, env, episodes=3, delay=0.02)
+    print(f"\nДемонстрация игры ({args.episodes} эпизодов):")
+    play(agent, env, episodes=args.episodes, delay=args.delay)
