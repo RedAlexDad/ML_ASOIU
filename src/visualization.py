@@ -50,10 +50,10 @@ def plot_results(
     plt.figure(figsize=(10, 6))
     plt.plot(rewards)
     if len(rewards) >= 50:
-        plt.fill_between(range(len(rewards)), 
-                         np.array(rewards) - np.std(rewards[-50:]), 
-                         np.array(rewards) + np.std(rewards[-50:]), 
-                         alpha=0.3)
+        std_val = float(np.std(rewards[-50:]))
+        y1 = [r - std_val for r in rewards]
+        y2 = [r + std_val for r in rewards]
+        plt.fill_between(range(len(rewards)), y1, y2, alpha=0.3)  # type: ignore
     plt.xlabel('Episode')
     plt.ylabel('Total Reward')
     plt.title('DQN Training Progress with Confidence Interval')

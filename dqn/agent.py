@@ -2,18 +2,9 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from typing import Optional, Dict, Any
 
-if TYPE_CHECKING:
-    import mlflow
-    import mlflow.pytorch
-
-import mlflow as mlflow_module
-mlflow = mlflow_module
-try:
-    import mlflow.pytorch
-except Exception:
-    mlflow.pytorch = None
+import mlflow  # type: ignore
 
 from dqn.network import QNetwork
 from dqn.buffer import ReplayBuffer
@@ -148,7 +139,7 @@ class DQNAgent:
         mlflow.log_metrics(metrics, step=episode)
 
     def log_model(self, artifact_path: str = "model") -> None:
-        mlflow.pytorch.log_model(
+        mlflow.pytorch.log_model(  # type: ignore
             self.q_network,
             artifact_path,
             registered_model_name=f"{self.experiment_name}_model"

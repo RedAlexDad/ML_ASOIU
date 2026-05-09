@@ -20,7 +20,7 @@ from src.evaluate import evaluate as evaluate_agent
 
 try:
     import mlflow
-    import mlflow.pytorch
+    import mlflow.pytorch  # type: ignore
     MLFLOW_AVAILABLE = True
 except ImportError:
     MLFLOW_AVAILABLE = False
@@ -103,8 +103,10 @@ def main():
         mlflow.log_param('device', str(device))
     
     env = gym.make('CartPole-v1')
-    obs_shape = env.observation_space.shape
-    action_dim = int(env.action_space.n)
+    obs_space = env.observation_space
+    action_space = env.action_space
+    obs_shape = obs_space.shape
+    action_dim = int(action_space.n)  # type: ignore
     print(f"Состояние: {obs_shape}, Действий: {action_dim}")
     
     agent = DQNAgent(
@@ -127,7 +129,7 @@ def main():
             action = env.action_space.sample()
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
-            agent.store_transition(state, action, reward, next_state, done)
+            agent.store_transition(state, action, float(reward), next_state, done)
             state = next_state
             if done:
                 break
@@ -157,7 +159,7 @@ def main():
     print(f"Модель сохранена: {args.model_path}")
     
     if use_mlflow:
-        mlflow.pytorch.log_model(agent.q_network, artifact_path='q_network')
+        mlflow.pytorch.log_model(agent.q_network, artifact_path='q_network')  # type: ignore
     
     plot_results(rewards, losses, q_values, save_path='plots')
     

@@ -54,7 +54,7 @@ def train(
                 if loss is not None:
                     episode_losses.append(loss)
             
-            total_reward += reward
+            total_reward += float(reward)
             state = next_state
             steps += 1
             total_steps += 1
@@ -68,15 +68,15 @@ def train(
         if episode_q_values:
             q_values_history.append(np.mean(episode_q_values))
         
-        avg_reward = np.mean(rewards_history[-10:]) if len(rewards_history) >= 10 else total_reward
-        current_loss = np.mean(episode_losses) if episode_losses else 0
-        current_q = np.mean(episode_q_values) if episode_q_values else 0
+        avg_reward = np.mean(rewards_history[-10:]) if len(rewards_history) >= 10 else float(total_reward)
+        current_loss = float(np.mean(episode_losses)) if episode_losses else 0.0
+        current_q = float(np.mean(episode_q_values)) if episode_q_values else 0.0
         
         if (episode + 1) % 10 == 0:
             print(f"Episode {episode+1}/{episodes} | Reward: {total_reward:.1f} | Steps: {steps} | Epsilon: {agent.epsilon:.3f}")
         
         if mlflow_logging and mlflow:
-            mlflow.log_metric('episode_reward', total_reward, step=episode)
+            mlflow.log_metric('episode_reward', float(total_reward), step=episode)
             mlflow.log_metric('episode_loss', current_loss, step=episode)
             mlflow.log_metric('episode_q', current_q, step=episode)
             mlflow.log_metric('epsilon', agent.epsilon, step=episode)
