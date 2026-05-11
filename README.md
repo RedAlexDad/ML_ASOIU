@@ -27,9 +27,9 @@
 
 ## Рубежные контроли
 
-| # | Тема | Вариант |
-|---|------|---------|
-| РК1 | Предобработка данных (EDA, выбросы, Target Encoding, MaxAbs Scaling) | 2 |
+| # | Тема | Ветка |
+|---|------|-------|
+| РК1 | Предобработка данных (EDA, выбросы, Target Encoding, MaxAbs Scaling) | [rk1-data-processing](https://github.com/RedAlexDad/ML_ASOIU/tree/rk1-data-processing) |
 
 ## Переключение между ветками
 
