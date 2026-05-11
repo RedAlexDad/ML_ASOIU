@@ -83,7 +83,7 @@ def load_model_for_demo(path: str, hidden_dim: int, network_type: str) -> DQNAge
     q_network = create_network(network_type, state_dim, action_dim, hidden_dim)
     target_network = create_network(network_type, state_dim, action_dim, hidden_dim)
     
-    agent = DQNAgent(state_dim=state_dim, action_dim=action_dim, hidden_dim=hidden_dim)
+    agent = DQNAgent(state_dim=state_dim, action_dim=action_dim, hidden_dim=hidden_dim, log_mlflow=False)
     agent.q_network = q_network
     agent.target_network = target_network
     

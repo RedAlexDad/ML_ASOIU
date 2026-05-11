@@ -50,7 +50,8 @@ class DQNAgent:
         target_update: int = 100,
         buffer_capacity: int = 10000,
         device: Optional[torch.device] = None,
-        experiment_name: str = "DQN_CartPole"
+        experiment_name: str = "DQN_CartPole",
+        log_mlflow: bool = True
     ) -> None:
         """
         Инициализация DQN агента.
@@ -115,8 +116,10 @@ class DQNAgent:
         # Буфер опыта для Experience Replay
         self.buffer = ReplayBuffer(buffer_capacity)
         
-        # Логирование гиперпараметров в MLflow
-        self._log_hyperparameters(locals())
+        # Логирование гиперпараметров в MLflow (если включено)
+        self.log_mlflow = log_mlflow
+        if log_mlflow:
+            self._log_hyperparameters(locals())
 
     def _log_hyperparameters(self, locals_dict: Dict[str, Any]) -> None:
         """Логирование гиперпараметров в MLflow."""
