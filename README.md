@@ -39,6 +39,7 @@ git checkout lr2-feature-processing-ev      # LR2
 git checkout lr3-multidimensional-search    # LR3
 git checkout lr4-constrained-optimization   # LR4
 git checkout lr5-dqn-reinforcement-learning # LR5
+git checkout rk1-data-processing            # РК1
 ```
 
 ## GitHub Pages
