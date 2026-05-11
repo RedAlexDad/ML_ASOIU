@@ -1,0 +1,25 @@
+{
+  "environment": {
+    "name": "CartPole-v1"
+  },
+  "model": {
+    "state_dim": 4,
+    "action_dim": 2,
+    "hidden_dim": 128,
+    "total_parameters": 17410,
+    "trainable_parameters": 17410
+  },
+  "hyperparameters": {
+    "lr": 0.003,
+    "gamma": 0.99,
+    "epsilon_decay": 0.98,
+    "epsilon_min": 0.01,
+    "buffer_capacity": 10000
+  },
+  "system": {
+    "device": "cuda",
+    "cuda_available": true,
+    "cuda_device_name": "NVIDIA GeForce GTX 1650 Ti",
+    "torch_version": "2.10.0+cu128"
+  }
+}
