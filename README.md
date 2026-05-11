@@ -12,6 +12,7 @@
 ├── lr2-feature-processing-ev/          # LR2 - Обработка признаков (ч.2)
 ├── lr3-multidimensional-search/        # LR3 - Многомерный поиск
 ├── lr4-constrained-optimization/       # LR4 - Условная оптимизация
+├── lr5-dqn-reinforcement-learning/     # LR5 - Глубокое Q-обучение (DQN)
 └── rk1-data-processing/                # РК1
 ```
 
